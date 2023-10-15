@@ -117,6 +117,7 @@ class InstaController extends Controller
             // validate access_token
             $request->validate([
                 'insta_access_token' => ['required', 'string', 'max:255'],
+                'refresh_access_token' => 'nullable|string|max:255',
             ]);
 
             // insta: user access token
@@ -127,6 +128,13 @@ class InstaController extends Controller
             // get user_id
             $user_id = $user->id;
             static::web_insta_api($insta_access_token, $user_id);
+
+            // refresh access token ??
+            $refresh_access_token = $request->input("refresh_access_token" ?? false);
+            if ($refresh_access_token == 1) {
+                static::web_insta_refresh($insta_access_token, $user_id);
+            }
+            
         }
 
         // keep breeze dashboard
@@ -165,6 +173,22 @@ class InstaController extends Controller
         // better form processing with ajax + json
         // https://laravel.com/docs/10.x/responses#json-responses
         return response()->json($insta_api_data);
+    }
+
+    function refresh_access_token(Request $request)
+    {
+        $user = $request->user();
+        if ($user ?? false) {
+            // validate access_token
+            $request->validate([
+                'insta_access_token' => ['required', 'string', 'max:255'],
+            ]);
+            $insta_access_token = $request->input("insta_access_token" ?? "");
+            // get user_id
+            $user_id = $user->id;
+            static::web_insta_refresh($insta_access_token, $user_id);
+        } 
+        return redirect('dashboard');
     }
 
     static function web_insta_api($access_token, $user_id)
@@ -241,6 +265,45 @@ class InstaController extends Controller
             "insta_me" => $insta_me_response ?? "",
             "id" => $id ?? "",
             "insta_graph" => $insta_graph_response ?? "",
+        ];
+    }
+
+    static function web_insta_refresh($access_token, $user_id)
+    {
+        if (!$access_token) {
+            return false;
+        }
+        $insta_refresh_access_token  = static::$insta_refresh_access_token . $access_token;
+        try {
+            // launch request
+            $insta_refresh_access_token_response = static::api_json($insta_refresh_access_token);
+
+            // get access_token from response
+            $access_token = $insta_refresh_access_token_response["access_token"] ?? "";
+            $access_token_expires_in = $insta_refresh_access_token_response["expires_in"] ?? "";
+            if ($access_token && $access_token_expires_in) {
+                // save to database: $access_token, $access_token_expires_in
+                // add to model InstaUser if $access_token not exists
+                InstaUser::updateOrCreate(
+                    [
+                        'user_id' => $user_id,
+                    ],
+                    [
+                        'access_token' => $access_token,
+                        "access_token_expires_in" => $access_token_expires_in,
+                    ]
+                );
+            }
+        } catch (RequestException $e) {
+            $error = $e->getMessage();
+        }
+
+        $now = date("Y-m-d H:i:s");
+        return [
+            "date" => $now,
+            "user_id" => $user_id ?? "",
+            "error" => $error ?? "",
+            "insta_refresh_access_token" => $insta_refresh_access_token_response ?? "",
         ];
     }
 

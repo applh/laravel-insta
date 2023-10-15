@@ -77,6 +77,30 @@
                             <p>{{ __('* To automatically update infos, cron can be set to ping this URL: ')}}<a target="_blank" href="{{ $insta_cron_url ?? '#' }}">{{ $insta_cron_url ?? "..." }}</a></p>
                             <p class="p-6">{{ __('tip: ') }}<a target="_blank" href="https://uptimerobot.com/">https://uptimerobot.com/</a>{{ __(' is a free uptime monitoring service.') }}</p>
                         </div>
+                        <div class="bg-gray-400">
+                            <hr>
+                            <h2 class="m-1 p-6 text-lg font-medium text-gray-900 bg-white">
+                                {{ __('(action) Refresh Access Token') }}
+                            </h2>
+                            <form method="post" action="{{ route('insta_refresh_access_token') }}" class="mt-6 space-y-6">
+                                @csrf
+                                @method('post')
+                                <input type="hidden" name="redirect_to" value="dashboard" />
+                                <div>
+                                    <x-input-label for="insta_access_token" :value="__('Access Token')" />
+                                    <x-text-input id="insta_access_token" name="insta_access_token" type="text" pattern="[^' ']+" class="mt-1 block w-full" :value="old('insta_access_token', $insta_access_token)" required autocomplete="" />
+                                    <x-input-error class="mt-2" :messages="$errors->get('insta_access_token')" />
+                                </div>
+
+                                <div class="">
+                                    <x-primary-button>{{ __('Refresh Access Token / every month') }}</x-primary-button>
+                                    <div>{{ __('last update: ') . $insta_user?->updated_at }}</div>
+                                </div>
+                                <p>{{ __('note: long lived access tokens lasts 90 days and can be refreshed...') }}</p>
+                                <p class="p-6"><a target="_blank" href="https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens">{{ __('https://developers.facebook.com/docs/instagram-basic-display-api/guides/long-lived-access-tokens') }}</a></p>
+                            </form>
+
+                        </div>
 
                     </div>
 

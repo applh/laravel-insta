@@ -110,6 +110,16 @@ php artisan serve
 
 ```
 
+## Objectifs: Affichage des posts Insta
+
+* Sur la page `dashboard`, on va afficher les derniers posts Insta de l'utilisateur.
+  * Il y a une pagination pour gérer un affichage d'un nombre maximal de posts.
+* Sur la page d'accueil, on va afficher les derniers posts Insta de tous les utilisateurs.
+  * Il y a une pagination pour gérer un affichage d'un nombre maximal de posts.
+* Sur la page d'accueil, on va afficher les liens vers les pages des derniers utilisateurs.
+* Sur la page d'un utilisateur, on va afficher les derniers posts Insta de cet utilisateur.
+  * Il y a une pagination pour gérer un affichage d'un nombre maximal de posts.
+
 ## Controller: InstaController
 
 ```bash
@@ -244,3 +254,22 @@ composer require guzzlehttp/guzzle
 
 Il existe de nombreuses solutions pour mettre en place un système de tâches planifiées.
 * Par exemple: https://uptimerobot.com/
+
+## Renouveler le token d'accès
+
+* Le token d'accès a une durée de vie de 90 jours.
+* Il faut le renouveler avant expiration.
+
+* On peut considérer que c'est une action manuelle de l'utilisateur à partir du `dashboard`.
+  * (motivation à se connecter au `dashboard`régulièrement)
+
+## Captures d'écran
+
+![Alt text](docs/home.png)
+
+![Alt text](docs/user.png)
+
+![Alt text](docs/dashboard.png)
+
+![Alt text](docs/dashboard2.png)
+

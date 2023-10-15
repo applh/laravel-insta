@@ -32,6 +32,10 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::post('/insta_api', [InstaController::class, 'api'])
     ->name('insta_api');
+
+    Route::any('/insta_refresh_access_token', [InstaController::class, 'refresh_access_token'])
+    ->name('insta_refresh_access_token');
+
 });
 
 
