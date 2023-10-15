@@ -21,10 +21,15 @@ Route::get('/', [InstaController::class, 'home'])
 Route::get('/user/{name}', [InstaController::class, 'user'])
 ->name('insta_user');
 
-Route::match(['get', 'post'], '/dashboard', [InstaController::class, 'dashboard'])
-->middleware(['auth', 'verified'])
-->name('dashboard');
-// keep breeze dashboard
+Route::middleware('auth', 'verified')->group(function () {
+    Route::get('/dashboard', [InstaController::class, 'dashboard'])
+    ->name('dashboard');
+    // keep breeze dashboard
+
+    Route::post('/insta_api', [InstaController::class, 'api'])
+    ->name('insta_api');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
