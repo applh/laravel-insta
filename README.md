@@ -87,3 +87,30 @@ php artisan serve
 ```bash
 php artisan make:controller InstaController
 ```
+
+### add routes and views
+
+* route: insta_home
+  * url: /
+  * controller: InstaController::home()
+  * view: insta_home.blade.php
+
+* route: insta_user
+  * url: /user/{name}
+  * controller: InstaController::user()
+  * view: insta_user.blade.php
+
+* route: dashboard
+  * url: /dashboard
+  * controller: InstaController::dashboard()
+  * view: dashboard.blade.php
+
+Add routes in  
+* routes/web.php
+
+Add views in
+* resources/views/insta_home.blade.php
+* resources/views/insta_user.blade.php
+* (breeze) resources/views/dashboard.blade.php
+
+

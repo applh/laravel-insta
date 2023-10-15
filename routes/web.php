@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InstaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,13 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [InstaController::class, 'home'])
+->name('insta_home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/user/{name}', [InstaController::class, 'user'])
+->name('insta_user');
+
+Route::match(['get', 'post'], '/dashboard', [InstaController::class, 'dashboard'])
+->middleware(['auth', 'verified'])
+->name('dashboard');
+// keep breeze dashboard
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
