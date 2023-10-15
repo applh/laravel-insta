@@ -41,6 +41,44 @@ Le plus rapide est de passer par une application Instagram existante.
   * pas besoin de créer un compte développeur Instagram
   * pas besoin de demander l'accès à l'API Instagram
 
+## Install from Github repo code
+
+Si vous voulez tester le projet, vous pouvez cloner le repo Github et installer le projet.
+
+```bash
+git clone https://github.com/applh/laravel-insta.git laravel-insta
+
+cd laravel-insta
+
+composer install
+
+# create .env file for Laravel (and sqlite database)
+cp .env.example .env
+
+# DB_CONNECTION=sqlite
+# # DB_HOST=127.0.0.1
+# # DB_PORT=3306
+# # DB_DATABASE=laravel
+# # DB_USERNAME=root
+# # DB_PASSWORD=
+
+# create SQLite database
+php artisan migrate
+# will create the database/database.sqlite file
+
+# npm install
+npm install
+# build assets
+npm run build
+
+# launch server
+php artisan serve
+
+```
+
+## Projet développement
+
+Voici les grandes étapes pour coder le projet.
 
 ## Laravel Breeze
 
@@ -263,6 +301,8 @@ Il existe de nombreuses solutions pour mettre en place un système de tâches pl
 * On peut considérer que c'est une action manuelle de l'utilisateur à partir du `dashboard`.
   * (motivation à se connecter au `dashboard`régulièrement)
 
+
+
 ## Captures d'écran
 
 ![Alt text](docs/home.png)
@@ -272,4 +312,16 @@ Il existe de nombreuses solutions pour mettre en place un système de tâches pl
 ![Alt text](docs/dashboard.png)
 
 ![Alt text](docs/dashboard2.png)
+
+![Alt text](docs/dashboard3.png)
+
+## TODOS...
+
+* supprimer le token d'accès
+* supprimer les posts insta
+* choisir de ne pas afficher certains posts insta
+* choisir l'ordre d'affichage des posts insta
+* ...
+
+
 
