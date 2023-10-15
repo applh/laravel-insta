@@ -81,3 +81,9 @@ php artisan serve
  ...
 
 ```
+
+## Controller: InstaController
+
+```bash
+php artisan make:controller InstaController
+```
