@@ -21,6 +21,10 @@ Route::get('/', [InstaController::class, 'home'])
 Route::get('/user/{name}', [InstaController::class, 'user'])
 ->name('insta_user');
 
+// could be moved to /api/
+Route::get('/insta_cron/{id}/{md5}', [InstaController::class, 'cron'])
+->name('insta_cron');
+
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/dashboard', [InstaController::class, 'dashboard'])
     ->name('dashboard');

@@ -133,6 +133,16 @@ php artisan make:controller InstaController
   * controller: InstaController::dashboard()
   * view: dashboard.blade.php
 
+* route: insta_api
+  * url: /insta_api
+  * controller: InstaController::api()
+  * redirect to: dashboard
+
+* route: insta_cron
+  * url: /insta_cron
+  * controller: InstaController::cron()
+  * return json response
+
 Add routes in  
 * routes/web.php
 
@@ -152,10 +162,11 @@ Add views in
   * redirect to: dashboard
 
 
+
 ## Models: Laravel Eloquent
 
 * API Instagram utiles
-  * Avec le token d'accèsn on peut accéder au endpoint `me` pour récupérer les informations de l'utilisateur et aussi la liste de ses media
+  * Avec le token d'accès on peut accéder au endpoint `me` pour récupérer les informations de l'utilisateur et aussi la liste de ses media
   * Avec le token d'accès on peut accéder au endpoint `media` pour récupérer les informations de chaque media
 
 * Endpoint `me`
@@ -215,3 +226,21 @@ php artisan migrate
 # add GuzzleHttp
 composer require guzzlehttp/guzzle
 ```
+
+## UX: Update manuel ou Automatique
+
+* On peut imaginer 2 modes de fonctionnement:
+  * Manuel: l'utilisateur doit cliquer sur un bouton pour récupérer les posts
+  * Automatique: les posts sont récupérés automatiquement toutes les X minutes
+
+* On va implémenter les 2 modes de fonctionnement.
+
+* Si l'utilisateur en publie que rarement, on peut imaginer que le mode automatique ne soit pas très utile.
+
+* Si l'utilisateur publie souvent, il est plus agréable que les posts soient mis à jour automatiquement.
+
+* Comme l'API Instagram a des limites de requêtes, on va limiter le nombre de requêtes automatiques.
+* On va proposer une URL privée pour chaque utilisateur qui voidrait mettre à jour ses posts automatiquement.
+
+Il existe de nombreuses solutions pour mettre en place un système de tâches planifiées.
+* Par exemple: https://uptimerobot.com/

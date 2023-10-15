@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Models\InstaUser;
 use App\Models\InstaMedia;
+use App\Models\User;
 
 class InstaController extends Controller
 {
@@ -16,27 +17,95 @@ class InstaController extends Controller
     static $insta_me = "https://graph.instagram.com/me?fields=id,username&access_token=";
     static $insta_graph = "https://graph.instagram.com/";
     static $insta_graph_media = "/media?fields=id,username,timestamp,caption,permalink,media_type,media_url&access_token=";
+    static $pagination = 2;
 
     public function home()
     {
-        return view('insta_home');
+        // get a list of 10 Users ordre by created_at DESC 
+        $recent_users = User::orderByDesc('created_at')->take(10)->get();
+
+        // get the list of InstaMedia
+        $pagination = env('INSTA_PAGINATION', static::$pagination);
+        // find all InstaMedia
+        $insta_media = InstaMedia::orderByDesc('insta_media_timestamp')
+            ->paginate($pagination);
+
+        return view('insta_home', [
+            'recent_users' => $recent_users,
+            'insta_media' => $insta_media,
+        ]);
     }
 
     public function user($name)
     {
-        return view('insta_user', ['name' => $name]);
+        // find User with name as $page_user_name
+        $page_user = User::where('name', $name)->first();
+        if (!$page_user) {
+            return redirect('/');
+        }
+        else {
+            // get InstaUser
+            $insta_user = InstaUser::where('user_id', $page_user->id)->first();
+            if ($insta_user) {
+                $insta_user_id = $insta_user->insta_id;
+            }
+        }
+        if ($insta_user_id ?? false) {
+            // find InstaUser with insta_id
+            $pagination = env('INSTA_PAGINATION', static::$pagination);
+            // find all InstaMedia with user_id
+            $insta_media = InstaMedia::where('insta_user_id', $insta_user_id)
+                ->orderByDesc('insta_media_timestamp')
+                ->paginate($pagination);
+        }
+
+        return view('insta_user', [
+            'page_user' => $page_user,
+            'insta_media' => $insta_media ?? null,
+        ]);
     }
 
     public function dashboard(Request $request)
     {
-        // get logged in user
-        $user = $request->user();
+        // pagination
+        $pagination = env('INSTA_PAGINATION', static::$pagination);
 
-        // keep breeze dashboard
+        // get user
+        $user = $request->user();
+        $insta_access_token = "";
+        $user_id = $user->id;
+
+        // find InstaUser with user_id
+        $insta_user = \App\Models\InstaUser::where('user_id', $user_id)->first();
+        if ($insta_user) {
+            $insta_user_id0 = $insta_user->id;
+            $insta_user_id = $insta_user->insta_id;
+            $insta_access_token = $insta_user->access_token;
+            $insta_username = $insta_user->insta_username;
+        }
+
+        if ($insta_user_id ?? false) {
+            // find all InstaMedia with user_id
+            $insta_media = \App\Models\InstaMedia::where('insta_user_id', $insta_user_id)
+                ->orderBy('insta_media_timestamp', 'desc')
+                ->paginate(2);
+            $nb_insta_media = count($insta_media);
+
+            // cron url
+            // get the full URL to the cron route
+            $insta_cron_url = url('/insta_cron/' . $insta_user_id0 . '/' . md5($insta_user_id));
+        }
         return view('dashboard', [
-            'user' => $user,
-            'insta_access_token' => $insta_access_token ?? '',
+            'insta_access_token' => $insta_access_token,
+            'insta_username' => $insta_username ?? "",
+            'insta_cron_url' => $insta_cron_url ?? "",
+            'insta_media' => $insta_media ?? [],
+            'nb_insta_media' => $nb_insta_media ?? 0,
+            'insta_user' => $insta_user ?? null,
+            'insta_user_id' => $insta_user_id ?? '',
+            'insta_user_id0' => $insta_user_id0 ?? '',
         ]);
+        
     }
 
     public function api(Request $request)
@@ -62,6 +131,40 @@ class InstaController extends Controller
 
         // keep breeze dashboard
         return redirect('/dashboard');
+    }
+
+    function cron(Request $request, $id, $md5)
+    {
+        // $id from model InstaUser
+        // $md5 from model InstaUser md5(insta_id)
+
+        $insta_api_data = [];
+        $insta_api_data["date"] = date("Y-m-d H:i:s");
+        $insta_api_data["id"] = $id;
+        $insta_api_data["md5"] = $md5;
+
+        // get user by $id
+        $insta_user = InstaUser::find($id);
+        if ($insta_user) {
+            // get insta_id
+            $insta_id = $insta_user->insta_id ?? "";
+            // check md5
+            $insta_id_md5 = md5($insta_id);
+            if ($insta_id_md5 == $md5) {
+                // get access_token
+                $access_token = $insta_user->access_token ?? "";
+                // get user_id
+                $user_id = $insta_user->user_id ?? "";
+                // get insta_api_data
+                $insta_api_data = static::web_insta_api($access_token, $user_id);
+            } else {
+                $insta_api_data["error"] = "md5 not match";
+            }
+        }
+
+        // better form processing with ajax + json
+        // https://laravel.com/docs/10.x/responses#json-responses
+        return response()->json($insta_api_data);
     }
 
     static function web_insta_api($access_token, $user_id)
