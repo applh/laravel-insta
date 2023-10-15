@@ -116,7 +116,7 @@ php artisan serve
 php artisan make:controller InstaController
 ```
 
-### add routes and views
+### Views: add routes and views
 
 * route: insta_home
   * url: /
@@ -152,3 +152,66 @@ Add views in
   * redirect to: dashboard
 
 
+## Models: Laravel Eloquent
+
+* API Instagram utiles
+  * Avec le token d'accèsn on peut accéder au endpoint `me` pour récupérer les informations de l'utilisateur et aussi la liste de ses media
+  * Avec le token d'accès on peut accéder au endpoint `media` pour récupérer les informations de chaque media
+
+* Endpoint `me`
+  * https://developers.facebook.com/docs/instagram-basic-display-api/reference/me/
+  * https://developers.facebook.com/docs/instagram-basic-display-api/reference/user
+
+* Endpoint `media`
+  * https://developers.facebook.com/docs/instagram-basic-display-api/reference/media
+
+
+Comme l'API Instagram a des limites de requêtes, on va stocker les données récupérées dans une base de données. (ici SQLite)
+* Cela permet de ne pas faire de requêtes inutiles à l'API Instagram.
+
+On va créer 2 modèles Eloquent:
+
+* InstaUser
+  * id (primary key)
+  * user_id (breeze)
+  * insta_access_token
+  * insta_user_id
+  * insta_username
+  * created_at
+  * updated_at
+  * ...
+  
+* InstaMedia
+  * id (primary key)
+  * insta_media_id
+  * insta_user_name
+  * insta_media_type
+  * insta_media_url
+  * insta_media_caption
+  * insta_media_timestamp
+  * created_at
+  * updated_at
+  * ...
+
+
+```bash
+php artisan make:model InstaUser -m
+php artisan make:model InstaMedia -m
+
+# add project columns to migrations
+# add columns to fillable in models
+
+# create tables
+php artisan migrate
+
+
+```
+
+## API Http Client
+
+* On utilisera GuzzleHttp pour effectuer les requêtes HTTP vers l'API Instagram.
+
+```
+# add GuzzleHttp
+composer require guzzlehttp/guzzle
+```
