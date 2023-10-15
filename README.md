@@ -41,7 +41,7 @@ Le plus rapide est de passer par une application Instagram existante.
   * pas besoin de créer un compte développeur Instagram
   * pas besoin de demander l'accès à l'API Instagram
 
-## Install from Github repo code
+## Installation depuis le repo Github
 
 Si vous voulez tester le projet, vous pouvez cloner le repo Github et installer le projet.
 
